@@ -32,13 +32,15 @@ class IEEE754
     public function hex64ToDouble(string $hex): float
     {
         $bin = base_convert($hex, 16, 2);
-        // 填充至64位
+        // 填充至64位 右侧补0
         $bin = str_pad($bin, 64, '0', STR_PAD_LEFT);
         if (strlen($bin) !== 64) {
             // 此处请改写为自定义异常抛出 或根据自己喜好返回false
             throw new IncorrectFormatException('Super long of hex:' . $hex);
         }
+        // 符号位置
         $S = $bin[0];
+        // 指数位置
         $E = substr($bin, 1, 11);
         // M部分需要按照规定前边补1. 形成1.01100101格式
         $M = '1.' . substr($bin, 12, strlen($bin));
@@ -55,6 +57,9 @@ class IEEE754
         return floatval('-' . ($I + $float));
     }
 
+    /**
+     * 指数计算
+     */
     private function getIndex(string $e): float|int
     {
         $int = 0;
@@ -65,6 +70,9 @@ class IEEE754
         return $int;
     }
 
+    /**
+     * 移动小数点.
+     */
     private function moveDecimalPointToRight(string $m, int $index): string
     {
         $startPoint = 0;
@@ -85,6 +93,9 @@ class IEEE754
         return $num;
     }
 
+    /**
+     * 转换小数部分
+     */
     private function convertFloat(string $f): float
     {
         $float = 0;
